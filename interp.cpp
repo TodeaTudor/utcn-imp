@@ -21,6 +21,11 @@ void Interp::Run()
         Push(prog_.Read<RuntimeFn>(pc_));
         continue;
       }
+      case Opcode::PUSH_INT: {
+        int64_t num = prog_.Read<int64_t>(pc_);
+        Push(num);
+        continue;
+      }
       case Opcode::PEEK: {
         auto idx = prog_.Read<unsigned>(pc_);
         Push(*(stack_.rbegin() + idx));
@@ -52,6 +57,12 @@ void Interp::Run()
         auto rhs = PopInt();
         auto lhs = PopInt();
         Push(lhs + rhs);
+        continue;
+      }
+      case Opcode::SUB: {
+        auto rhs = PopInt();
+        auto lhs = PopInt();
+        Push(rhs - lhs);
         continue;
       }
       case Opcode::RET: {

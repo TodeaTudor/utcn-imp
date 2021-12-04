@@ -12,6 +12,10 @@ Token::Token(const Token &that)
   , kind_(that.kind_)
 {
   switch (kind_) {
+    case Kind::INT: {
+      value_.IntValue = that.value_.IntValue;
+      break;
+    }
     case Kind::STRING:
     case Kind::IDENT: {
       value_.StringValue = new std::string(*that.value_.StringValue);
@@ -27,18 +31,23 @@ Token::Token(const Token &that)
 Token &Token::operator=(const Token &that)
 {
   switch (kind_) {
-    case Kind::STRING:
-    case Kind::IDENT: {
-      delete value_.StringValue;
-      break;
-    }
-    default: {
-      break;
+    case Kind::STRING: {
+      case Kind::IDENT: {
+        delete value_.StringValue;
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
   loc_ = that.loc_;
   kind_ = that.kind_;
   switch (kind_) {
+    case Kind::INT: {
+      value_.IntValue = that.value_.IntValue;
+      break;
+    }
     case Kind::STRING:
     case Kind::IDENT: {
       value_.StringValue = new std::string(*that.value_.StringValue);
@@ -47,6 +56,7 @@ Token &Token::operator=(const Token &that)
     default: {
       break;
     }
+
   }
   return *this;
 }
@@ -82,6 +92,13 @@ Token Token::String(const Location &l, const std::string &str)
   return tk;
 }
 
+// -----------------------------------------------------------------------------
+Token Token::Integer(const Location &l, const uint64_t &integer)
+{
+  Token tk(l, Kind::INT);
+  tk.value_.IntValue = integer;
+  return tk;
+}
 // -----------------------------------------------------------------------------
 void Token::Print(std::ostream &os) const
 {
@@ -121,6 +138,7 @@ std::ostream &operator<<(std::ostream &os, const Token::Kind kind)
     case Token::Kind::EQUAL: return os << "=";
     case Token::Kind::COMMA: return os << ",";
     case Token::Kind::PLUS: return os << "+";
+    case Token::Kind::MINUS: return os << "-";
     case Token::Kind::END: return os << "END";
     case Token::Kind::INT: return os << "INT";
     case Token::Kind::STRING: return os << "STRING";
@@ -182,6 +200,7 @@ const Token &Lexer::Next()
     case ';': return NextChar(), tk_ = Token::Semi(loc);
     case '=': return NextChar(), tk_ = Token::Equal(loc);
     case '+': return NextChar(), tk_ = Token::Plus(loc);
+    case '-': return NextChar(), tk_ = Token::Minus(loc);
     case ',': return NextChar(), tk_ = Token::Comma(loc);
     case '"': {
       std::string word;
@@ -207,6 +226,14 @@ const Token &Lexer::Next()
         if (word == "return") return tk_ = Token::Return(loc);
         if (word == "while") return tk_ = Token::While(loc);
         return tk_ = Token::Ident(loc, word);
+      }else if (isdigit(chr_)) {
+        int64_t number = 0;
+        do {
+          number = number * 10;
+          number += chr_ - '0';
+          NextChar();
+        } while (isdigit(chr_));
+        return tk_ = Token::Integer(loc, number);
       }
       Error("unknown character '" + std::string(1, chr_) + "'");
     }

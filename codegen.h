@@ -130,7 +130,7 @@ private:
 
   /// Lowers a function declaration.
   void LowerFuncDecl(const Scope &scope, const FuncDecl &funcDecl);
-
+  void LowerIntExpr (const Scope &scope, const IntExpr &integer);
 private:
   /// Create a new label.
   Label MakeLabel();
@@ -149,6 +149,8 @@ private:
   void EmitReturn();
   /// Emit an add opcode.
   void EmitAdd();
+  /// Emit an sub opcode.
+  void EmitSub();
   /// Emit a label.
   void EmitLabel(Label label);
   /// Emit a conditional jump.
@@ -162,6 +164,7 @@ private:
   /// Emit an address or create a fixup for later.
   void EmitFixup(Label label);
 
+  void EmitInt(const IntExpr &integer);
 private:
   /// Reference to the program constructed by the code generator.
   std::vector<uint8_t> code_;

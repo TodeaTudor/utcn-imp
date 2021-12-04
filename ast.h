@@ -45,6 +45,7 @@ public:
     REF,
     BINARY,
     CALL,
+    INT
   };
 
 public:
@@ -82,7 +83,12 @@ class BinaryExpr : public Expr {
 public:
   /// Enumeration of binary operators.
   enum class Kind {
-    ADD
+    MUL,
+    DIV,
+    EQ,
+    MOD,
+    ADD,
+    SUB
   };
 
 public:
@@ -106,6 +112,17 @@ private:
   std::shared_ptr<Expr> rhs_;
 };
 
+class IntExpr: public Expr {
+
+public:
+  IntExpr(uint64_t integer) : Expr(Kind::INT), value_(integer) {}
+  int64_t getValue() const  {
+    return value_;
+  } 
+
+private:
+  uint64_t value_;
+};
 /**
  * Call expression.
  */
