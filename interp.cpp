@@ -56,6 +56,17 @@ void Interp::Run()
       case Opcode::ADD: {
         auto rhs = PopInt();
         auto lhs = PopInt();
+
+        uint64_t sum = (uint64_t) lhs + (uint64_t) rhs;
+
+        if (((uint64_t) rhs >> 63) == 0 && ((uint64_t) lhs >> 63) == 0 && (sum >> 63) == 1) {
+          throw RuntimeError("The result of the addition is too large");
+        }
+
+        if (((uint64_t) rhs >> 63) == 1 && ((uint64_t) lhs >> 63) == 1 && (sum >> 63) == 0) {
+          throw RuntimeError("The result of the addition is too small");
+        }
+
         Push(lhs + rhs);
         continue;
       }

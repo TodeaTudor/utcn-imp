@@ -227,7 +227,7 @@ const Token &Lexer::Next()
         if (word == "while") return tk_ = Token::While(loc);
         return tk_ = Token::Ident(loc, word);
       }else if (isdigit(chr_)) {
-        int64_t number = 0;
+        uint64_t number = 0;
         do {
           number = number * 10;
           number += chr_ - '0';
